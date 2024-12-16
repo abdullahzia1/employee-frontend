@@ -1,0 +1,93 @@
+
+  .swiper-slide {
+    font-size: 18px;
+    background: #F2F0F1;
+  
+    /* Center slide text vertically */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .swiper-slide img {
+    width: 100%;
+    height: 100%;
+  }
+  
+  /* Add these styles to your existing styles file */
+
+@keyframes slideInFromTop {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromBottom {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-from-top {
+  animation: slideInFromTop 1s both;
+}
+
+.animate-from-bottom {
+  animation: slideInFromBottom 1s both;
+}
+
+/* Add this to your existing styles file */
+@media (max-width: 576px) {
+  .headingbanner {
+    font-size: 50px !important;   /* Adjust the font size for small screens */
+    text-align: center !important;
+
+  }
+}
+
+@media (min-width: 577px) and (max-width: 992px) {
+  .headingbanner {
+    font-size: 55px !important;  /* Adjust the font size for medium screens */
+    text-align: center !important;
+
+  }
+}
+
+@media (max-width: 576px) {
+  .secondbanner {
+    font-size: 20px !important;   /* Adjust the font size for small screens */
+    text-align: center !important;
+
+  }
+}
+
+@media (min-width: 577px) and (max-width: 992px) {
+  .secondbanner {
+    font-size: 30px !important;  /* Adjust the font size for medium screens */
+    text-align: center !important;
+
+  }
+}
+@media (max-width: 576px) {
+  .thirdbanner {
+    font-size: 13px !important;   /* Adjust the font size for small screens */
+    text-align: center !important;
+  }
+}
+
+@media (min-width: 577px) and (max-width: 992px) {
+  .thirdbanner {
+    font-size: 18px !important;  /* Adjust the font size for medium screens */
+    text-align: center !important;
+  }
+}
