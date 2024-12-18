@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Form, Button } from "react-bootstrap";
 
 import Loader from "../components/Loader.js";
 import FormContainer from "../components/FormContainer.js";
-
-import { toast } from "react-toastify";
 import AuthContext from "../context/AuthContext.js";
 
 const LoginScreen = () => {
@@ -16,33 +14,26 @@ const LoginScreen = () => {
 
   const isLoading = false;
 
-  const { search } = useLocation();
-  const sp = new URLSearchParams(search);
-  const redirect = sp.get("redirect") || "/";
+  const { user, loginUser } = useContext(AuthContext);
 
-  const { user } = useContext(AuthContext);
+  useEffect(() => {
+    const storedEmail = localStorage.getItem("email");
+    const storedPassword = localStorage.getItem("password");
 
-  // useEffect(() => {
-  //   if (user) {
-  //     // navigate(redirect);
-  //     navigate("/");
-  //   }
-  // }, [navigate, redirect, user]);
+    if (storedEmail) {
+      setEmail(storedEmail);
+    }
+    if (storedPassword) {
+      setPassword(storedPassword);
+    }
+  }, []);
+
   useEffect(() => {
     if (user) {
-      // navigate(redirect);
-      navigate("/");
+      console.log(user);
+      navigate("/homescreen");
     }
-  }, [navigate, user]);
-
-  const submitHandler = async (e) => {
-    e.preventDefault();
-    try {
-      navigate(redirect);
-    } catch (err) {
-      toast.error(err?.data?.message || err.error);
-    }
-  };
+  }, [user]);
 
   return (
     <FormContainer>
@@ -58,7 +49,7 @@ const LoginScreen = () => {
         Sigin In
       </h1>
 
-      <Form onSubmit={submitHandler}>
+      <Form onSubmit={loginUser}>
         <Form.Group className="my-2" controlId="email">
           <Form.Label
             style={{

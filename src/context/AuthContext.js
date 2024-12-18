@@ -9,22 +9,37 @@ const AuthContext = createContext();
 export default AuthContext;
 
 export const AuthProvider = ({ children }) => {
-  const [authTokens, setAuthToken] = useState(() =>
-    localStorage.getItem("authToken")
-      ? JSON.parse(localStorage.getItem("authToken"))
-      : null
-  );
-  const [user, setUser] = useState(() =>
-    localStorage.getItem("authToken")
-      ? jwtDecode(localStorage.getItem("authToken"))
-      : null
-  );
-  const [loading, setLoading] = useState(true);
+  const [trackingId, setTrackingId] = useState(null);
+  //
+  const [authToken, setAuthToken] = useState(() => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      try {
+        // Parse the token only if it's not already an object
+        return token.startsWith('"') && token.endsWith('"')
+          ? token
+          : JSON.parse(token);
+      } catch (err) {
+        console.error("Error parsing token:", err);
+        return null;
+      }
+    }
+    return null;
+  });
+
+  const [user, setUser] = useState(() => {
+    const token = localStorage.getItem("authToken");
+    return token && token.includes(".") ? jwtDecode(token) : null;
+  });
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate(); // Use useNavigate here for navigation
 
   const loginUser = async (e) => {
+    setIsLoading(true);
     e.preventDefault();
+    localStorage.setItem("email", e.target.email.value);
+    localStorage.setItem("password", e.target.password.value);
 
     try {
       const response = await fetch(`http://localhost:5000/api/employee/login`, {
@@ -41,43 +56,45 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json();
 
       if (response.status === 200) {
-        setAuthToken(data);
-        const token = data.access_Token;
-        setUser(jwtDecode(token.toString()));
-        localStorage.setItem("authToken", JSON.stringify(data));
-        navigate("/"); // Use navigate here instead of window.location.href
+        const token = data.token;
+
+        if (token && token.split(".").length === 3) {
+          setAuthToken(token);
+          setUser(data.user);
+          setTrackingId(data.tracking_id);
+          localStorage.setItem("authToken", JSON.stringify(token));
+          navigate("/homescreen");
+        } else {
+          toast.error("Invalid token format");
+        }
+        setIsLoading(false);
       } else {
         toast.error("Invalid Credentials");
       }
     } catch (err) {
       toast.error(err?.data?.message || err.error);
+      setIsLoading(false);
     }
   };
 
   const logoutUser = () => {
     setAuthToken(null);
     setUser(null);
-    localStorage.removeItem("authTokens");
-    navigate("/login"); // Use navigate here for logout
+    localStorage.removeItem("authToken");
+    navigate("/login");
   };
-
-  useEffect(() => {
-    if (authTokens) {
-      setUser(jwtDecode(authTokens.access_Token));
-    }
-    setLoading(false);
-  }, [authTokens]);
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        authTokens,
+        authToken,
         loginUser,
         logoutUser,
         setUser,
         setAuthToken,
-        loading,
+        isLoading,
+        trackingId,
       }}
     >
       {children}

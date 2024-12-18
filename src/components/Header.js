@@ -6,10 +6,10 @@ import { Link } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
 
 const Header = () => {
-  const { user, logout } = useContext(AuthContext);
+  const { user, logoutUser } = useContext(AuthContext);
 
   return (
-    <header>
+    <header style={{ margin: "20px 0px" }}>
       {/* Bootstrap Navbar */}
       <Navbar
         variant="light"
@@ -66,7 +66,7 @@ const Header = () => {
 
                   {/* Logout button */}
                   <button
-                    onClick={logout}
+                    onClick={logoutUser}
                     style={{
                       backgroundColor: "transparent",
                       border: "none",

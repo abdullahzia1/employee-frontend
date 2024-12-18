@@ -4,7 +4,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { Route, Routes } from "react-router-dom";
 
 import LoginScreen from "./screens/LoginScreen.js";
-import ProfileScreen from "./screens/ProfileScreen.js";
 import Header from "./components/Header.js";
 import { AuthProvider } from "./context/AuthContext.js";
 import HomeScreen from "./screens/HomeScreen.js";
@@ -18,13 +17,10 @@ const App = () => {
         <ToastContainer />
         <Routes>
           <Route path="/login" element={<LoginScreen />} />
-
-          {/* Protected Route */}
-          <Route path="/" element={<PrivateRoute element={<HomeScreen />} />} />
           {/* Protected Route */}
           <Route
-            path="/profile"
-            element={<PrivateRoute element={<ProfileScreen />} />}
+            path="/homescreen"
+            element={<PrivateRoute element={<HomeScreen />} />}
           />
         </Routes>
       </AuthProvider>
