@@ -16,6 +16,7 @@ const App = () => {
         <Header />
         <ToastContainer />
         <Routes>
+          <Route path="/" element={<LoginScreen />} />
           <Route path="/login" element={<LoginScreen />} />
           {/* Protected Route */}
           <Route

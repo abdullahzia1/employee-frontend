@@ -1,5 +1,5 @@
 import React, { createContext, useState } from "react";
-import { jwtDecode } from "jwt-decode";
+// import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -70,7 +70,7 @@ export const AuthProvider = ({ children }) => {
           setTrackingId(data.tracking_id);
           setShiftStatus(data.shiftCompleted);
           const flaskResponse = await fetch(
-            "http://localhost:5001/api/set-tracking-id",
+            "http://127.0.0.1:5001/api/set-tracking-id",
             {
               method: "POST",
               headers: {
