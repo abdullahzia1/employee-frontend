@@ -3,99 +3,86 @@ import { Container, Row, Col, Button } from "react-bootstrap";
 
 import Loader from "../components/Loader.js";
 import Message from "../components/Message.js";
-import useTimeTracking from "../hooks/useTimeTracking"; // Import the custom hook
+import useTimeTracking from "../hooks/useTimeTracking";
 import AuthContext from "../context/AuthContext.js";
 
 const HomeScreen = () => {
   // Define state for managing button states
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+
   const [hasWorkEnd, setHasWorkEnd] = useState(false);
-  const [isWorkStarted, setIsWorkStarted] = useState(false);
   const [isBreakStarted, setIsBreakStarted] = useState(false);
+
+  const [isWorkStarted, setIsWorkStarted] = useState(false);
   const [isWorkShiftActive, setIsWorkShiftActive] = useState(true);
 
   // Destructure the performTimeTrackingAction function from the custom hook
   const { performTimeTrackingAction } = useTimeTracking();
-  const { user, trackingId } = useContext(AuthContext);
+  const { user, trackingId, shiftStatus, setShiftStatus } =
+    useContext(AuthContext);
 
-  // Handle start work action
-  const handleStartWork = async () => {
+  // Generic function for handling time tracking actions
+  const handleAction = async (actionType, setStateFn, successState) => {
     setIsLoading(true);
     const result = await performTimeTrackingAction(
-      "start",
+      actionType,
       trackingId,
       user.employee_id
     );
-    if (result) {
-      setIsWorkStarted(true);
-      setIsBreakStarted(false);
-    } else {
-      setError("Failed to start work");
-    }
     setIsLoading(false);
+
+    if (result) {
+      setStateFn(successState);
+    } else {
+      setError(`Failed to ${actionType}`);
+    }
+  };
+
+  // Handle start work action
+  const handleStartWork = () => {
+    handleAction(
+      "start",
+      (status) => {
+        setIsWorkStarted(status);
+        setIsBreakStarted(false);
+      },
+      true
+    );
   };
 
   // Handle end work action
-  const handleEndWork = async () => {
-    setIsLoading(true);
-    const result = await performTimeTrackingAction(
+  const handleEndWork = () => {
+    handleAction(
       "end",
-      trackingId,
-      user.employee_id
+      (status) => {
+        setIsWorkStarted(false);
+        setIsBreakStarted(false);
+        setHasWorkEnd(status);
+        setShiftStatus(true);
+      },
+      false
     );
-    if (result) {
-      setIsWorkStarted(false);
-      setIsBreakStarted(false);
-      setHasWorkEnd(true); // You can set a condition when work ends
-    } else {
-      setError("Failed to end work");
-    }
-    setIsLoading(false);
   };
 
   // Handle start break action
-  const handleStartBreak = async () => {
-    setIsLoading(true);
-    const result = await performTimeTrackingAction(
-      "break-start",
-      trackingId,
-      user.employee_id
-    );
-    if (result) {
-      setIsBreakStarted(true);
-    } else {
-      setError("Failed to start break");
-    }
-    setIsLoading(false);
+  const handleStartBreak = () => {
+    handleAction("break-start", (status) => setIsBreakStarted(status), true);
   };
 
   // Handle end break action
-  const handleEndBreak = async () => {
-    setIsLoading(true);
-    const result = await performTimeTrackingAction(
-      "break-end",
-      trackingId,
-      user.employee_id
-    );
-    if (result) {
-      setIsBreakStarted(false);
-    } else {
-      setError("Failed to end break");
-    }
-    setIsLoading(false);
+  const handleEndBreak = () => {
+    handleAction("break-end", (status) => setIsBreakStarted(status), false);
   };
 
-  // Handle time shift logic (you can change the hours if needed)
+  // Use effect to check if the shift time has passed (e.g., end the break at 5 AM)
   useEffect(() => {
     const checkTime = () => {
       const currentTime = new Date();
       const currentHour = currentTime.getHours();
 
-      if (currentHour >= 5 && currentHour < 17) {
-        setIsWorkShiftActive(false);
-      } else {
-        setIsWorkShiftActive(true);
+      if (currentHour === 5) {
+        handleEndWork(); // Automatically end the break if it’s 5 AM
       }
     };
 
@@ -103,7 +90,17 @@ const HomeScreen = () => {
 
     const interval = setInterval(checkTime, 60000); // 60,000 ms = 1 minute
     return () => clearInterval(interval);
-  }, []);
+  }, [isBreakStarted]);
+
+  // Lock the button when shift is completed
+  useEffect(() => {
+    if (shiftStatus === true) {
+      setIsWorkStarted(true); // Disable start work button
+      setIsWorkShiftActive(false); // Disable shift options
+    }
+  }, [shiftStatus]);
+
+  // If shift is completed, display message and disable further actions
 
   return (
     <>
@@ -111,6 +108,14 @@ const HomeScreen = () => {
         <Loader />
       ) : error ? (
         <Message variant="danger">{error}</Message>
+      ) : shiftStatus ? (
+        <>
+          {" "}
+          <Message variant="info">
+            The shift is already completed. You cannot start work again.
+          </Message>
+          <div>.</div>
+        </>
       ) : (
         <>
           {!hasWorkEnd && (

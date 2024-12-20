@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -9,6 +9,11 @@ const AuthContext = createContext();
 export default AuthContext;
 
 export const AuthProvider = ({ children }) => {
+  const [shiftStatus, setShiftStatus] = useState(() => {
+    // Load shiftStatus from localStorage or default to false
+    const savedShiftStatus = localStorage.getItem("shiftStatus");
+    return savedShiftStatus ? JSON.parse(savedShiftStatus) : true;
+  });
   const [trackingId, setTrackingId] = useState(null);
   //
   const [authToken, setAuthToken] = useState(() => {
@@ -28,8 +33,8 @@ export const AuthProvider = ({ children }) => {
   });
 
   const [user, setUser] = useState(() => {
-    const token = localStorage.getItem("authToken");
-    return token && token.includes(".") ? jwtDecode(token) : null;
+    const userData = localStorage.getItem("user");
+    return userData ? JSON.parse(userData) : null;
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -59,10 +64,32 @@ export const AuthProvider = ({ children }) => {
         const token = data.token;
 
         if (token && token.split(".").length === 3) {
+          console.log(data);
           setAuthToken(token);
           setUser(data.user);
           setTrackingId(data.tracking_id);
+          setShiftStatus(data.shiftCompleted);
+          const flaskResponse = await fetch(
+            "http://localhost:5001/api/set-tracking-id",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                trackingId: data.tracking_id,
+              }),
+            }
+          );
+          const flaskData = await flaskResponse.json();
+          console.log("Tracking ID sent to Flask:", flaskData.data);
           localStorage.setItem("authToken", JSON.stringify(token));
+          localStorage.setItem(
+            "shiftStatus",
+            JSON.stringify(data.shiftCompleted)
+          );
+          localStorage.setItem("user", JSON.stringify(data.user));
+
           navigate("/homescreen");
         } else {
           toast.error("Invalid token format");
@@ -81,6 +108,8 @@ export const AuthProvider = ({ children }) => {
     setAuthToken(null);
     setUser(null);
     localStorage.removeItem("authToken");
+    localStorage.removeItem("shiftStatus");
+    localStorage.removeItem("user");
     navigate("/login");
   };
 
@@ -93,8 +122,10 @@ export const AuthProvider = ({ children }) => {
         logoutUser,
         setUser,
         setAuthToken,
+        setShiftStatus,
         isLoading,
         trackingId,
+        shiftStatus,
       }}
     >
       {children}
