@@ -69,8 +69,8 @@ export const AuthProvider = ({ children }) => {
           setUser(data.user);
           setTrackingId(data.tracking_id);
           setShiftStatus(data.shiftCompleted);
-          const flaskResponse = await fetch(
-            "http://127.0.0.1:5001/api/set-tracking-id",
+          const electronResponse = await fetch(
+            "http://localhost:4000/api/set-tracking-id",
             {
               method: "POST",
               headers: {
@@ -78,11 +78,12 @@ export const AuthProvider = ({ children }) => {
               },
               body: JSON.stringify({
                 trackingId: data.tracking_id,
+                shiftStatus: data.shiftCompleted,
               }),
             }
           );
-          const flaskData = await flaskResponse.json();
-          console.log("Tracking ID sent to Flask:", flaskData.data);
+          const electronData = await electronResponse.json();
+          console.log("Tracking ID sent to Flask:", electronData.data);
           localStorage.setItem("authToken", JSON.stringify(token));
           localStorage.setItem(
             "shiftStatus",
@@ -99,6 +100,7 @@ export const AuthProvider = ({ children }) => {
         toast.error("Invalid Credentials");
       }
     } catch (err) {
+      console.log(err);
       toast.error(err?.data?.message || err.error);
       setIsLoading(false);
     }
