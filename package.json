@@ -3,13 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "main": "public/index.html",
+  "homepage": "/",
   "scripts": {
     "start": "cross-env BROWSER=none react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "tauri": "tauri",
-    "bundle": "tauri build"
+    "eject": "react-scripts eject"
   },
   "dependencies": {
     "bootstrap": "^5.3.3",
@@ -28,7 +27,6 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@tauri-apps/cli": "^2.1.0",
     "cross-env": "^7.0.3"
   },
   "eslintConfig": {
