@@ -35,7 +35,20 @@ const Header = () => {
               />
             </Navbar.Brand>
           </Link>
-
+          <Nav className="ms-auto">
+            <Link
+              to="/time"
+              style={{
+                textDecoration: "none",
+                color: "#000000",
+                marginRight: "20px",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              Time
+            </Link>
+          </Nav>
           {/* Navbar toggle button */}
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
 
@@ -51,7 +64,6 @@ const Header = () => {
                 // If user is authenticated
                 <>
                   <Link
-                    to="/profile"
                     style={{
                       textDecoration: "none",
                       color: "#000000",
