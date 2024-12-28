@@ -79,6 +79,7 @@ export const AuthProvider = ({ children }) => {
               body: JSON.stringify({
                 trackingId: data.tracking_id,
                 shiftStatus: data.shiftCompleted,
+                tracking: true,
               }),
             }
           );

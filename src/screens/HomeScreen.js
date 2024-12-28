@@ -5,6 +5,7 @@ import Loader from "../components/Loader.js";
 import Message from "../components/Message.js";
 import useTimeTracking from "../hooks/useTimeTracking";
 import AuthContext from "../context/AuthContext.js";
+import useIdleTime from "../hooks/useIdleTime.js";
 
 const HomeScreen = () => {
   // Define state for managing button states
@@ -19,9 +20,15 @@ const HomeScreen = () => {
 
   // Destructure the performTimeTrackingAction function from the custom hook
   const { performTimeTrackingAction } = useTimeTracking();
+  const { updateIdleState } = useIdleTime();
   const { user, trackingId, shiftStatus, setShiftStatus } =
     useContext(AuthContext);
 
+  const handleIdleAction = async (url) => {
+    setIsLoading(true);
+    const result = await updateIdleState(url, trackingId);
+    setIsLoading(false);
+  };
   // Generic function for handling time tracking actions
   const handleAction = async (actionType, setStateFn, successState) => {
     setIsLoading(true);
@@ -63,16 +70,19 @@ const HomeScreen = () => {
       },
       false
     );
+    handleIdleAction("end-work");
   };
 
   // Handle start break action
   const handleStartBreak = () => {
     handleAction("break-start", (status) => setIsBreakStarted(status), true);
+    handleIdleAction("start-break");
   };
 
   // Handle end break action
   const handleEndBreak = () => {
     handleAction("break-end", (status) => setIsBreakStarted(status), false);
+    handleIdleAction("end-break");
   };
 
   // Use effect to check if the shift time has passed (e.g., end the break at 5 AM)
