@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AGENT_URL } from "../utility/helper";
 
 // This is a simple fetch function wrapped for time tracking actions
 const useIdleTime = () => {
@@ -15,7 +16,7 @@ const useIdleTime = () => {
     };
 
     try {
-      const response = await fetch(`http://localhost:4000/api/${url}`, {
+      const response = await fetch(`${AGENT_URL}/${url}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

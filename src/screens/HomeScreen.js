@@ -89,7 +89,7 @@ const HomeScreen = () => {
       const currentTime = new Date();
       const currentHour = currentTime.getHours();
 
-      if (currentHour === 5) {
+      if (currentHour === 7) {
         handleEndWork();
       }
     };
