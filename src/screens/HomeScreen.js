@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Container, Row, Col, Button, Modal } from "react-bootstrap";
+import { format } from "date-fns";
 
 import Loader from "../components/Loader.js";
 import Message from "../components/Message.js";
@@ -8,11 +9,13 @@ import AuthContext from "../context/AuthContext.js";
 import useIdleTime from "../hooks/useIdleTime.js";
 
 const HomeScreen = () => {
+  //state hooks
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const [showEndWorkModal, setShowEndWorkModal] = useState(false);
 
+  // fetch data hooks
   const { performTimeTrackingAction } = useTimeTracking();
 
   const { updateIdleState } = useIdleTime();
@@ -24,8 +27,16 @@ const HomeScreen = () => {
     setShiftStatus,
     breakStatus,
     setBreakStatus,
+    startingTime,
   } = useContext(AuthContext);
-
+  const hour = new Date().getHours();
+  const date = new Date(startingTime);
+  const formattedDate = format(date, "HH:mm yyyy-MM-dd");
+  const styledTime = `${formattedDate.slice(0, 5)} ${
+    hour > 12 ? "PM" : "AM"
+  }  ${formattedDate.slice(6)} `;
+  // console.log(styledTime);
+  // console.log();
   // handling idle time for all type of actions
   const handleIdleAction = async (url) => {
     setIsLoading(true);
@@ -103,11 +114,33 @@ const HomeScreen = () => {
       ) : (
         <Container>
           <Row
+            as={"h4"}
             style={{
               display: "flex",
               justifyContent: "center",
               gap: "30px",
-              marginTop: "150px",
+              marginTop: "70px",
+            }}
+          >
+            <span
+              style={{
+                backgroundColor: "darkgrey",
+                padding: "20px",
+                justifyItems: "center",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <span> Start Time: {styledTime}</span>
+            </span>
+          </Row>
+
+          <Row
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "30px",
+              marginTop: "70px",
             }}
           >
             {/* Work buttons */}

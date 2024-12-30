@@ -21,6 +21,11 @@ export const AuthProvider = ({ children }) => {
   });
 
   const [trackingId, setTrackingId] = useState(null);
+  const [startingTime, setStartingTime] = useState(() => {
+    // Load shiftStatus from localStorage or default to false
+    const savedStartingTime = localStorage.getItem("startingTime");
+    return savedStartingTime ? JSON.parse(savedStartingTime) : null;
+  });
   //
   const [authToken, setAuthToken] = useState(() => {
     const token = localStorage.getItem("authToken");
@@ -76,6 +81,19 @@ export const AuthProvider = ({ children }) => {
           setTrackingId(data.tracking_id);
           setShiftStatus(data.shiftCompleted);
           setBreakStatus(data.breakStatus);
+          setStartingTime(data.shiftStartTime);
+
+          localStorage.setItem("authToken", JSON.stringify(token));
+          localStorage.setItem(
+            "shiftStatus",
+            JSON.stringify(data.shiftCompleted)
+          );
+          localStorage.setItem("breakStatus", JSON.stringify(data.breakStatus));
+          localStorage.setItem("user", JSON.stringify(data.user));
+          localStorage.setItem(
+            "startingTime",
+            JSON.stringify(data.shiftStartTime)
+          );
           // const electronResponse = await fetch(
           //   "http://localhost:4000/api/set-tracking-id",
           //   {
@@ -87,18 +105,13 @@ export const AuthProvider = ({ children }) => {
           //       trackingId: data.tracking_id,
           //       shiftStatus: data.shiftCompleted,
           //       tracking: true,
+          //       breakStatus: data.breakStatus
+          //       authToken: token
           //     }),
           //   }
           // );
           // const electronData = await electronResponse.json();
           // console.log("Tracking ID sent to electron:", electronData.data);
-          localStorage.setItem("authToken", JSON.stringify(token));
-          localStorage.setItem(
-            "shiftStatus",
-            JSON.stringify(data.shiftCompleted)
-          );
-          localStorage.setItem("breakStatus", JSON.stringify(data.breakStatus));
-          localStorage.setItem("user", JSON.stringify(data.user));
 
           navigate("/homescreen");
         } else {
@@ -140,6 +153,7 @@ export const AuthProvider = ({ children }) => {
         shiftStatus,
         breakStatus,
         setBreakStatus,
+        startingTime,
       }}
     >
       {children}
