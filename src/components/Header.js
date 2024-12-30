@@ -40,10 +40,32 @@ const Header = () => {
               to="/time"
               style={{
                 textDecoration: "none",
-                color: "#000000",
-                marginRight: "20px",
+                padding: "10px",
+                backgroundColor: "#04AA6D",
+                border: "1px solid",
+                borderRadius: "5px",
                 display: "flex",
+                marginLeft: "300px",
                 alignItems: "center",
+                fontWeight: "bold",
+                color: "#ffffff",
+              }}
+            >
+              Attendance
+            </Link>
+            <Link
+              to="/time"
+              style={{
+                textDecoration: "none",
+                padding: "10px",
+                backgroundColor: "#04AA6D",
+                border: "1px solid",
+                borderRadius: "5px",
+                display: "flex",
+                marginLeft: "60px",
+                alignItems: "center",
+                fontWeight: "bold",
+                color: "#ffffff",
               }}
             >
               Time

@@ -1,7 +1,11 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { BASE_URL } from "../utility/helper";
+import AuthContext from "../context/AuthContext";
 
-const Time = () => {
+const SingleAttendanceDisplay = () => {
+  const [attendanceDate, setAttendanceDate] = useState(null);
+  const { authToken } = useContext(AuthContext);
   let isData = false;
 
   const employeData = {
@@ -9,6 +13,33 @@ const Time = () => {
     checkOut: Date().split("GMT+0500 (Pakistan Standard Time)"),
     break: 2,
     work: 9,
+  };
+
+  const fetchAttendanceRecord = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/employee/get-attendance`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${authToken}`,
+        },
+        body: JSON.stringify(attendanceDate),
+      });
+
+      if (!response.status === 200) {
+        logout();
+        navigate("/login");
+        throw new Error("Error performing action");
+      }
+
+      const data = await response.json();
+      console.log("Data from Hook", data);
+      return data; // You can return the response from the backend here if needed
+    } catch (error) {
+      console.log("ERROR !!!!", error);
+      setError(error.message);
+      return null; // If you want to handle this in your component later
+    }
   };
 
   return (
@@ -27,14 +58,18 @@ const Time = () => {
           <div className="col-sm-6">
             <input
               type="date"
-              id="date"
+              onChange={(e) => setAttendanceDate(e.target.value)}
               name="date"
               className="form-control"
               required
             />
           </div>
           <div className="col-sm-4 text-start">
-            <button type="submit" className="btn btn-success">
+            <button
+              type="submit"
+              className="btn btn-success"
+              onClick={fetchAttendanceRecord}
+            >
               View
             </button>
           </div>
@@ -70,4 +105,4 @@ const Time = () => {
   );
 };
 
-export default Time;
+export default SingleAttendanceDisplay;

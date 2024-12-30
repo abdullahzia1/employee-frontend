@@ -8,7 +8,7 @@ import Header from "./components/Header.js";
 import { AuthProvider } from "./context/AuthContext.js";
 import HomeScreen from "./screens/HomeScreen.js";
 import PrivateRoute from "./components/PrivateRoutes.js";
-import Time from "./screens/Time.js";
+import SingleAttendanceDisplay from "./screens/SingleAttendanceDisplay.js";
 
 const App = () => {
   return (
@@ -24,7 +24,10 @@ const App = () => {
             path="/homescreen"
             element={<PrivateRoute element={<HomeScreen />} />}
           />
-          <Route path="/time" element={<PrivateRoute element={<Time />} />} />
+          <Route
+            path="/time"
+            element={<PrivateRoute element={<SingleAttendanceDisplay />} />}
+          />
         </Routes>
       </AuthProvider>
     </div>
