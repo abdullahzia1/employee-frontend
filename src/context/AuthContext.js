@@ -14,6 +14,12 @@ export const AuthProvider = ({ children }) => {
     const savedShiftStatus = localStorage.getItem("shiftStatus");
     return savedShiftStatus ? JSON.parse(savedShiftStatus) : true;
   });
+  const [breakStatus, setBreakStatus] = useState(() => {
+    // Load shiftStatus from localStorage or default to false
+    const savedBreakStatus = localStorage.getItem("breakStatus");
+    return savedBreakStatus ? JSON.parse(savedBreakStatus) : false;
+  });
+
   const [trackingId, setTrackingId] = useState(null);
   //
   const [authToken, setAuthToken] = useState(() => {
@@ -69,27 +75,29 @@ export const AuthProvider = ({ children }) => {
           setUser(data.user);
           setTrackingId(data.tracking_id);
           setShiftStatus(data.shiftCompleted);
-          const electronResponse = await fetch(
-            "http://localhost:4000/api/set-tracking-id",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                trackingId: data.tracking_id,
-                shiftStatus: data.shiftCompleted,
-                tracking: true,
-              }),
-            }
-          );
-          const electronData = await electronResponse.json();
-          console.log("Tracking ID sent to Flask:", electronData.data);
+          setBreakStatus(data.breakStatus);
+          // const electronResponse = await fetch(
+          //   "http://localhost:4000/api/set-tracking-id",
+          //   {
+          //     method: "POST",
+          //     headers: {
+          //       "Content-Type": "application/json",
+          //     },
+          //     body: JSON.stringify({
+          //       trackingId: data.tracking_id,
+          //       shiftStatus: data.shiftCompleted,
+          //       tracking: true,
+          //     }),
+          //   }
+          // );
+          // const electronData = await electronResponse.json();
+          // console.log("Tracking ID sent to electron:", electronData.data);
           localStorage.setItem("authToken", JSON.stringify(token));
           localStorage.setItem(
             "shiftStatus",
             JSON.stringify(data.shiftCompleted)
           );
+          localStorage.setItem("breakStatus", JSON.stringify(data.breakStatus));
           localStorage.setItem("user", JSON.stringify(data.user));
 
           navigate("/homescreen");
@@ -102,7 +110,7 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (err) {
       console.log(err);
-      toast.error(err?.data?.message || err.error);
+      toast.error("Invalid Credentials");
       setIsLoading(false);
     }
   };
@@ -112,6 +120,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem("authToken");
     localStorage.removeItem("shiftStatus");
+    localStorage.removeItem("breakStatus");
     localStorage.removeItem("user");
     navigate("/login");
   };
@@ -129,6 +138,8 @@ export const AuthProvider = ({ children }) => {
         isLoading,
         trackingId,
         shiftStatus,
+        breakStatus,
+        setBreakStatus,
       }}
     >
       {children}

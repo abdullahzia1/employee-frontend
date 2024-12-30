@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { Container, Row, Col, Button, Modal } from "react-bootstrap";
 
 import Loader from "../components/Loader.js";
 import Message from "../components/Message.js";
@@ -8,28 +8,32 @@ import AuthContext from "../context/AuthContext.js";
 import useIdleTime from "../hooks/useIdleTime.js";
 
 const HomeScreen = () => {
-  // Define state for managing button states
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const [hasWorkEnd, setHasWorkEnd] = useState(false);
-  const [isBreakStarted, setIsBreakStarted] = useState(false);
+  const [showEndWorkModal, setShowEndWorkModal] = useState(false);
 
-  const [isWorkStarted, setIsWorkStarted] = useState(false);
-  const [isWorkShiftActive, setIsWorkShiftActive] = useState(true);
-
-  // Destructure the performTimeTrackingAction function from the custom hook
   const { performTimeTrackingAction } = useTimeTracking();
-  const { updateIdleState } = useIdleTime();
-  const { user, trackingId, shiftStatus, setShiftStatus } =
-    useContext(AuthContext);
 
+  const { updateIdleState } = useIdleTime();
+
+  const {
+    user,
+    trackingId,
+    shiftStatus,
+    setShiftStatus,
+    breakStatus,
+    setBreakStatus,
+  } = useContext(AuthContext);
+
+  // handling idle time for all type of actions
   const handleIdleAction = async (url) => {
     setIsLoading(true);
-    const result = await updateIdleState(url, trackingId);
+    await updateIdleState(url, trackingId);
     setIsLoading(false);
   };
-  // Generic function for handling time tracking actions
+
+  // handling start,end work. start break & end break
   const handleAction = async (actionType, setStateFn, successState) => {
     setIsLoading(true);
     const result = await performTimeTrackingAction(
@@ -45,27 +49,13 @@ const HomeScreen = () => {
       setError(`Failed to ${actionType}`);
     }
   };
-
-  // Handle start work action
-  const handleStartWork = () => {
-    handleAction(
-      "start",
-      (status) => {
-        setIsWorkStarted(status);
-        setIsBreakStarted(false);
-      },
-      true
-    );
-  };
-
-  // Handle end work action
+  // handling end work.
   const handleEndWork = () => {
     handleAction(
       "end",
-      (status) => {
-        setIsWorkStarted(false);
-        setIsBreakStarted(false);
-        setHasWorkEnd(status);
+      () => {
+        // setIsBreakStarted(false); //to remove
+        setBreakStatus(false); //
         setShiftStatus(true);
       },
       false
@@ -73,44 +63,31 @@ const HomeScreen = () => {
     handleIdleAction("end-work");
   };
 
-  // Handle start break action
   const handleStartBreak = () => {
-    handleAction("break-start", (status) => setIsBreakStarted(status), true);
-    handleIdleAction("start-break");
+    handleAction("break-start", setBreakStatus, true);
+    handleIdleAction("start-break"); // stops the idle tracking
   };
 
-  // Handle end break action
   const handleEndBreak = () => {
-    handleAction("break-end", (status) => setIsBreakStarted(status), false);
-    handleIdleAction("end-break");
+    handleAction("break-end", setBreakStatus, false);
+    handleIdleAction("end-break"); // starts the idle tracking
   };
 
-  // Use effect to check if the shift time has passed (e.g., end the break at 5 AM)
   useEffect(() => {
     const checkTime = () => {
       const currentTime = new Date();
       const currentHour = currentTime.getHours();
 
       if (currentHour === 5) {
-        handleEndWork(); // Automatically end the break if it’s 5 AM
+        handleEndWork();
       }
     };
 
     checkTime();
 
-    const interval = setInterval(checkTime, 60000); // 60,000 ms = 1 minute
+    const interval = setInterval(checkTime, 60000);
     return () => clearInterval(interval);
-  }, [isBreakStarted]);
-
-  // Lock the button when shift is completed
-  useEffect(() => {
-    if (shiftStatus === true) {
-      setIsWorkStarted(true); // Disable start work button
-      setIsWorkShiftActive(false); // Disable shift options
-    }
-  }, [shiftStatus]);
-
-  // If shift is completed, display message and disable further actions
+  }, [breakStatus]);
 
   return (
     <>
@@ -119,88 +96,97 @@ const HomeScreen = () => {
       ) : error ? (
         <Message variant="danger">{error}</Message>
       ) : shiftStatus ? (
-        <>
-          {" "}
-          <Message variant="info">
-            The shift is already completed. You cannot start work again.
-          </Message>
-          <div>.</div>
-        </>
+        <Message variant="info">
+          The shift is already completed. You cannot start work again at this
+          time.
+        </Message>
       ) : (
-        <>
-          {!hasWorkEnd && (
-            <Container>
-              <Row
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  gap: "30px",
-                  marginTop: "150px",
-                }}
+        <Container>
+          <Row
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "30px",
+              marginTop: "150px",
+            }}
+          >
+            {/* Work buttons */}
+            <Col
+              xs="auto"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <Button
+                variant="primary"
+                disabled
+                style={{ width: "150px", marginBottom: "15px" }}
               >
-                {/* First row - Work buttons */}
-                <Col
-                  xs="auto"
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                  }}
-                >
-                  <Button
-                    variant="primary"
-                    onClick={handleStartWork}
-                    disabled={isWorkStarted || !isWorkShiftActive}
-                    style={{ width: "150px", marginBottom: "15px" }}
-                  >
-                    Start Work
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    onClick={handleEndWork}
-                    disabled={!isWorkStarted}
-                    style={{ width: "150px" }}
-                  >
-                    End Work
-                  </Button>
-                </Col>
+                Start Work
+              </Button>
+              <Button
+                variant="danger"
+                onClick={() => setShowEndWorkModal(true)}
+                style={{ width: "150px" }}
+              >
+                End Work
+              </Button>
+            </Col>
 
-                {/* Second row - Break buttons */}
-                <Col
-                  xs="auto"
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                  }}
+            {/* Break buttons */}
+            <Col
+              xs="auto"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <>
+                <Button
+                  variant="warning"
+                  onClick={handleStartBreak}
+                  disabled={breakStatus}
+                  style={{ width: "150px", marginBottom: "15px" }}
                 >
-                  {isWorkStarted && (
-                    <>
-                      <Button
-                        variant="warning"
-                        onClick={handleStartBreak}
-                        disabled={isBreakStarted}
-                        style={{ width: "150px", marginBottom: "15px" }}
-                      >
-                        Start Break
-                      </Button>
-
-                      <Button
-                        variant="danger"
-                        onClick={handleEndBreak}
-                        disabled={!isBreakStarted}
-                        style={{ width: "150px" }}
-                      >
-                        End Break
-                      </Button>
-                    </>
-                  )}
-                </Col>
-              </Row>
-            </Container>
-          )}
-        </>
+                  Start Break
+                </Button>
+                <Button
+                  variant="danger"
+                  onClick={handleEndBreak}
+                  disabled={!breakStatus}
+                  style={{ width: "150px" }}
+                >
+                  End Break
+                </Button>
+              </>
+            </Col>
+          </Row>
+        </Container>
       )}
+      <Modal
+        style={{ marginTop: "100px" }}
+        show={showEndWorkModal}
+        onHide={() => setShowEndWorkModal(false)}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm End Work</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to end your work shift? This action cannot be
+          undone.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="danger" onClick={() => setShowEndWorkModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={handleEndWork}>
+            Yes, End Work
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 };
