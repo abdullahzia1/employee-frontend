@@ -54,7 +54,7 @@ const Header = () => {
               Attendance
             </Link>
             <Link
-              to="/time"
+              to="/leave"
               style={{
                 textDecoration: "none",
                 padding: "10px",
@@ -68,7 +68,7 @@ const Header = () => {
                 color: "#ffffff",
               }}
             >
-              Time
+              Leaves
             </Link>
           </Nav>
           {/* Navbar toggle button */}
