@@ -1,47 +1,49 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { BASE_URL } from "../utility/helper";
 import AuthContext from "../context/AuthContext";
 
+import convertISOTime from "../utility/timeConvert";
+
 const SingleAttendanceDisplay = () => {
   const [attendanceDate, setAttendanceDate] = useState(null);
-  const { authToken } = useContext(AuthContext);
-  let isData = false;
+  const [apiCall, setApiCall] = useState(true);
 
-  const employeData = {
-    checkIn: Date().split("GMT+0500 (Pakistan Standard Time)"),
-    checkOut: Date().split("GMT+0500 (Pakistan Standard Time)"),
-    break: 2,
-    work: 9,
-  };
+  const [data, setData] = useState();
 
-  const fetchAttendanceRecord = async () => {
+  const checkIn = convertISOTime(data?.checkIn);
+  const checkOut = convertISOTime(data?.checkOut);
+
+  const { authToken, user } = useContext(AuthContext);
+
+  const fetchAttendanceRecord = async (e) => {
+    e.preventDefault();
     try {
+      let employeeId = user.employee_id;
       const response = await fetch(`${BASE_URL}/employee/get-attendance`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `${authToken}`,
         },
-        body: JSON.stringify(attendanceDate),
+        body: JSON.stringify({ attendanceDate, employeeId }),
       });
 
-      if (!response.status === 200) {
-        logout();
-        navigate("/login");
-        throw new Error("Error performing action");
+      if (response.status === 200) {
+        const data = await response.json();
+        console.log("Data from Hook", data);
+        setData(data);
       }
-
-      const data = await response.json();
-      console.log("Data from Hook", data);
-      return data; // You can return the response from the backend here if needed
     } catch (error) {
       console.log("ERROR !!!!", error);
-      setError(error.message);
-      return null; // If you want to handle this in your component later
     }
   };
 
+  useEffect(() => {
+    if (data) {
+      console.log("Re Render", data?.checkIn?.slice(11, 13));
+    }
+  }, [data]);
   return (
     <div
       className="container mt-4 p-4 bg-white rounded shadow-sm"
@@ -58,7 +60,12 @@ const SingleAttendanceDisplay = () => {
           <div className="col-sm-6">
             <input
               type="date"
-              onChange={(e) => setAttendanceDate(e.target.value)}
+              onChange={(e) => {
+                setAttendanceDate(e.target.value);
+              }}
+              onInput={() => {
+                setApiCall(false);
+              }}
               name="date"
               className="form-control"
               required
@@ -69,33 +76,38 @@ const SingleAttendanceDisplay = () => {
               type="submit"
               className="btn btn-success"
               onClick={fetchAttendanceRecord}
+              disabled={apiCall}
             >
               View
             </button>
           </div>
         </div>
       </form>
-
+      {!data && <p>No Data</p>}
       <div>
-        <div className="text-end fw-bold mb-2">Total Duration (Hours): 9</div>
+        <div className="text-end fw-bold mb-2">Shift Duration (Hours): 9</div>
         <table className="table table-bordered">
           <thead className="table-light">
             <tr>
               <th>Check In</th>
               <th>Check Out</th>
-              <th>Duration (Hours)</th>
+              <th>Worked (Hours)</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              {/* <td>{employeData.checkIn}</td> */}
-              <td>{employeData.checkIn}</td>
-              <td>{employeData.checkOut}</td>
-              <td>{employeData.work - employeData.break}h</td>
-              {isData && (
-                <td colSpan="5" className="text-center text-muted">
-                  No Records Found
-                </td>
+              {data && (
+                <>
+                  {" "}
+                  <td>{checkIn ? checkIn : "Nothing"}</td>
+                  <td>{checkOut ? checkOut : "Nothing"}</td>
+                  <td>
+                    {`${data?.totalWorkTime?.slice(
+                      0,
+                      2
+                    )}h : ${data?.totalWorkTime?.slice(3, 5)}m`}
+                  </td>{" "}
+                </>
               )}
             </tr>
           </tbody>
