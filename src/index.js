@@ -6,7 +6,7 @@ import { HelmetProvider } from "react-helmet-async";
 
 import App from "./App.js";
 
-import { HashRouter, BrowserRouter } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
