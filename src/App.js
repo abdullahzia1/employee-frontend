@@ -11,6 +11,7 @@ import PrivateRoute from "./components/PrivateRoutes.js";
 
 import SingleAttendanceDisplay from "./screens/SingleAttendanceDisplay.js";
 import LeavesDisplay from "./screens/LeavesDisplay.js";
+
 const App = () => {
   return (
     <div>

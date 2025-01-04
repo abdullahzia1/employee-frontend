@@ -8,7 +8,7 @@ const MyLeaveList = () => {
 
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  const [data, setData] = useState("");
+  const [data, setData] = useState([]);
 
   const isTrue = toDate && fromDate ? true : false;
   const fetchLeaves = async () => {
@@ -26,7 +26,8 @@ const MyLeaveList = () => {
       if (response.status === 200) {
         const data = await response.json();
         console.log("Data from Hook", data);
-        setData(data);
+        setData(data.totalLeaves);
+        console.log(data);
       }
     } catch (error) {
       console.log("ERROR !!!!", error);
@@ -115,6 +116,33 @@ const MyLeaveList = () => {
             </button>
           </div>
         </form>
+      </div>
+      <div className="container">
+        <h1>Employee Leave Records</h1>
+        <table className="table table-bordered mt-4">
+          <thead className="thead-light">
+            <tr>
+              <th>Leave ID</th>
+              <th>Leave Type</th>
+              <th>From Date</th>
+              <th>To Date</th>
+              <th>Employee ID</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data?.map((leave) => (
+              <tr key={leave.leave_id}>
+                <td>{leave.leave_id}</td>
+                <td>{leave.leave_type}</td>
+                <td>{new Date(leave.from_date).toLocaleDateString()}</td>
+                <td>{new Date(leave.to_date).toLocaleDateString()}</td>
+                <td>{leave.employee_id}</td>
+                <td>{leave.status === null ? "Pending" : "Approved"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

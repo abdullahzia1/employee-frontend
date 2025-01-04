@@ -34,6 +34,11 @@ const SingleAttendanceDisplay = () => {
         console.log("Data from Hook", data);
         setData(data);
       }
+      if (response.status === 204) {
+        const data = await response.json();
+        console.log("Data from Hook", data);
+        setData(null);
+      }
     } catch (error) {
       console.log("ERROR !!!!", error);
     }
@@ -83,7 +88,7 @@ const SingleAttendanceDisplay = () => {
           </div>
         </div>
       </form>
-      {!data && <p>No Data</p>}
+      {data === null && <p>No Data</p>}
       <div>
         <div className="text-end fw-bold mb-2">Shift Duration (Hours): 9</div>
         <table className="table table-bordered">

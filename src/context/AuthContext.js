@@ -129,12 +129,13 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logoutUser = () => {
-    setAuthToken(null);
-    setUser(null);
-    localStorage.removeItem("authToken");
     localStorage.removeItem("shiftStatus");
     localStorage.removeItem("breakStatus");
     localStorage.removeItem("user");
+    localStorage.removeItem("startingTime");
+    localStorage.removeItem("authToken");
+    setUser(null);
+    setAuthToken(null);
     navigate("/login");
   };
 

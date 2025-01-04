@@ -8,6 +8,7 @@ import AuthContext from "../context/AuthContext";
 const Header = () => {
   const { user, logoutUser } = useContext(AuthContext);
 
+  if (!user) return <></>;
   return (
     <header style={{ margin: "20px 0px" }}>
       {/* Bootstrap Navbar */}

@@ -6,13 +6,14 @@ import { useNavigate } from "react-router-dom";
 
 const ApplyLeaveForm = () => {
   const [displayLeaveBalance, setDisplayLeaveBalance] = useState(false);
-  const [myLeaveBalance, setMyLeaveBalance] = useState(0.0);
+  const [myLeaveBalance, setMyLeaveBalance] = useState(null);
   const [leaveType, setLeaveType] = useState("");
   const [leaveInterval, setLeaveInterval] = useState(0);
   const [comments, setComments] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
+  const [totalLeaves, setTotalLeaves] = useState(null);
   const { user, authToken } = useContext(AuthContext);
   const navigate = useNavigate();
   const isTrue =
@@ -34,6 +35,7 @@ const ApplyLeaveForm = () => {
         const data = await response.json();
         console.log("Data from Hook", data);
         setMyLeaveBalance(+data.leaveBalance);
+        setTotalLeaves(+data.totalLeaves);
       }
     } catch (error) {
       console.log("ERROR !!!!", error);
@@ -79,8 +81,11 @@ const ApplyLeaveForm = () => {
 
   return (
     <div className="container mt-5 p-4 bg-white rounded shadow-sm w-75">
+      <h5 className="mb-4">
+        Total Leaves: {totalLeaves <= 0 || null ? 0 : totalLeaves}
+      </h5>
       <h5 className="mb-4">Apply Leave</h5>
-      {myLeaveBalance > 0 && (
+      {myLeaveBalance >= 1 && (
         <form>
           <div className="row mb-3">
             <div className="col-md-6">
@@ -178,7 +183,7 @@ const ApplyLeaveForm = () => {
           </div>
         </form>
       )}
-      {myLeaveBalance === 0 && (
+      {myLeaveBalance <= 0 && (
         <div>You Leave Quota is Zero, Contact your HR department.</div>
       )}
     </div>
