@@ -94,24 +94,24 @@ export const AuthProvider = ({ children }) => {
             "startingTime",
             JSON.stringify(data.shiftStartTime)
           );
-          // const electronResponse = await fetch(
-          //   "http://localhost:4000/api/set-tracking-id",
-          //   {
-          //     method: "POST",
-          //     headers: {
-          //       "Content-Type": "application/json",
-          //     },
-          //     body: JSON.stringify({
-          //       trackingId: data.tracking_id,
-          //       shiftStatus: data.shiftCompleted,
-          //       tracking: true,
-          //       breakStatus: data.breakStatus
-          //       authToken: token
-          //     }),
-          //   }
-          // );
-          // const electronData = await electronResponse.json();
-          // console.log("Tracking ID sent to electron:", electronData.data);
+          const electronResponse = await fetch(
+            "http://localhost:4000/api/set-tracking-id",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                trackingId: data.tracking_id,
+                shiftStatus: data.shiftCompleted,
+                tracking: true,
+                breakStatus: data.breakStatus,
+                authToken: token,
+              }),
+            }
+          );
+          const electronData = await electronResponse.json();
+          console.log("Tracking ID sent to electron:", electronData.data);
 
           navigate("/homescreen");
         } else {

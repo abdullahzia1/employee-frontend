@@ -6,14 +6,14 @@ import { HelmetProvider } from "react-helmet-async";
 
 import App from "./App.js";
 
-import { BrowserRouter } from "react-router-dom";
+import { HashRouter } from "react-router-dom";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <BrowserRouter>
+    <HashRouter>
       <HelmetProvider>
         <App />
       </HelmetProvider>
-    </BrowserRouter>
+    </HashRouter>
   </StrictMode>
 );
