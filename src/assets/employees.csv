@@ -1,3 +1,0 @@
-"employee_id","first_name","last_name","department_id","shift_status","hire_date","email","created_at","updated_at","hashedpassword","billing","scheduling","production","isadmin","is_supervisor","leave_balance","total_leaves"
-1,"John","Doe",1,False,"2024-12-10","john@medrevn.com","2024-12-16 15:58:29.779263-08","2024-12-16 15:58:29.779263-08","$2b$10$hplMMfhH5eYod4CSzNx9A.elD/t7XpKAsAivRu9aiiXR9g/Q1kw0W",True,False,False,False,False,"0","0"
-5,"ABDZ","xyz",1,True,"2024-12-24","admin@medrevn.com","2024-12-24 11:42:03.463372-08","2024-12-24 11:42:03.463372-08","$2b$10$OefXB36W1lSuJXNojM.l1O8FadWiT5XYE138meTFFKN94RZWIWWJu",False,False,False,True,False,"0","1"

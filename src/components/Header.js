@@ -17,13 +17,13 @@ const Header = () => {
       : "btn btn-success text-white fw-bold"; // Default state
 
   return (
-    <header style={{ margin: "20px 0px" }}>
+    <header style={{ margin: "0 auto", backgroundColor: " #dfd3a0" }}>
       <Navbar
         variant="light"
         expand="sm"
         collapseOnSelect
         style={{
-          background: "#ffffff",
+          background: " #dfd3a0",
           color: "#000",
           width: "100%",
           minHeight: "5vh",
@@ -36,30 +36,46 @@ const Header = () => {
             <Navbar.Brand>
               <img
                 src={logo}
-                height={40}
+                height={80}
                 alt="Medrevn LLC"
-                style={{ width: "100px" }}
+                style={{ width: "200px" }}
               />
             </Navbar.Brand>
           </Link>
 
           {/* Navigation links */}
           <Nav className="mw-25 h-[20px] mx-auto d-flex gap-3 align-items-center">
+            <Link to="/homescreen" className={getLinkClass("/homescreen")}>
+              Homescreen
+            </Link>
             <Link to="/time" className={getLinkClass("/time")}>
               Attendance
             </Link>
             <Link to="/leave" className={getLinkClass("/leave")}>
               Leaves
             </Link>
-            <Link to="/admin" className={getLinkClass("/admin")}>
-              Admin
-            </Link>
-            <Link to="/performance" className={getLinkClass("/performance")}>
-              Time
-            </Link>
-            <Link to="/status" className={getLinkClass("/status")}>
-              Status
-            </Link>
+            {user.isadmin && (
+              <>
+                {" "}
+                <Link to="/admin" className={getLinkClass("/admin")}>
+                  Admin
+                </Link>
+                <Link
+                  to="/performance"
+                  className={getLinkClass("/performance")}
+                >
+                  Time
+                </Link>
+              </>
+            )}
+            {user.isadmin ||
+              (user.is_supervisor && (
+                <>
+                  <Link to="/status" className={getLinkClass("/status")}>
+                    Status
+                  </Link>
+                </>
+              ))}
           </Nav>
 
           {/* User authentication links */}

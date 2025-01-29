@@ -6,14 +6,21 @@ import { HelmetProvider } from "react-helmet-async";
 
 import App from "./App.js";
 
-import { BrowserRouter } from "react-router-dom";
+import { HashRouter } from "react-router-dom";
+import { checkJwtExpiration } from "./utility/tokenChecker.js";
+
+const intervalId = setInterval(() => {
+  checkJwtExpiration(); // Check JWT expiration every 30 minutes
+}, 1800000); // 30 minutes in milliseconds
+
+window.addEventListener("beforeunload", () => clearInterval(intervalId));
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <BrowserRouter>
+    <HashRouter>
       <HelmetProvider>
         <App />
       </HelmetProvider>
-    </BrowserRouter>
+    </HashRouter>
   </StrictMode>
 );

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { apiService } from "../service/apiService";
+import { BASE_URL } from "../utility/helper";
 
 // This is a simple fetch function wrapped for time tracking actions
 const useTimeTracking = () => {
@@ -20,24 +22,15 @@ const useTimeTracking = () => {
     };
 
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/employee/track-time`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestData),
-        }
+      const data = await apiService.post(
+        `${BASE_URL}/employee/track-time`,
+        requestData
       );
 
-      if (!response.status === 200) {
+      if (!data) {
         throw new Error("Error performing action");
       }
-
-      const data = await response.json();
-      console.log("Data from Hook", data);
-      return data; // You can return the response from the backend here if needed
+      return data;
     } catch (error) {
       console.log("ERROR !!!!", error);
       setError(error.message);

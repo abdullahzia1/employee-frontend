@@ -35,9 +35,7 @@ const HomeScreen = () => {
   const styledTime = `${formattedDate.slice(0, 5)} ${
     hour > 12 ? "PM" : "AM"
   }  ${formattedDate.slice(6)} `;
-  // console.log(styledTime);
-  // console.log();
-  // handling idle time for all type of actions
+
   const handleIdleAction = async (url) => {
     setIsLoading(true);
     await updateIdleState(url, trackingId);
@@ -84,22 +82,6 @@ const HomeScreen = () => {
     handleIdleAction("end-break"); // starts the idle tracking
   };
 
-  useEffect(() => {
-    const checkTime = () => {
-      const currentTime = new Date();
-      const currentHour = currentTime.getHours();
-
-      if (currentHour === 7) {
-        handleEndWork();
-      }
-    };
-
-    checkTime();
-
-    const interval = setInterval(checkTime, 60000);
-    return () => clearInterval(interval);
-  }, [breakStatus]);
-
   return (
     <>
       {isLoading ? (
@@ -112,7 +94,7 @@ const HomeScreen = () => {
           time.
         </Message>
       ) : (
-        <Container>
+        <Container style={{ height: "100px", width: "100%", backgroundColor: " #dfd3a0" }}>
           <Row
             as={"h4"}
             style={{
@@ -124,8 +106,8 @@ const HomeScreen = () => {
           >
             <span
               style={{
-                backgroundColor: "darkgrey",
                 padding: "20px",
+                width: "400px",
                 justifyItems: "center",
                 alignItems: "center",
                 justifyContent: "center",

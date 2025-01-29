@@ -12,14 +12,14 @@ const EmployeeStatus = () => {
 
   useEffect(() => {
     const fetchEmployeeData = async () => {
-      let user = { first_name: "Raza" };
-      if (!user || !user.first_name) {
+      if (!user.isadmin || !user.first_name) {
         setError("User data is not available.");
         setLoading(false);
         return;
       }
 
       const supervisor = user.first_name;
+      const admin = user.isadmin;
 
       try {
         const presentResponse = await fetch(
@@ -29,7 +29,7 @@ const EmployeeStatus = () => {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ supervisor }),
+            body: JSON.stringify({ supervisor, admin }),
           }
         );
         const presentData = await presentResponse.json();
@@ -44,7 +44,7 @@ const EmployeeStatus = () => {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ supervisor }),
+            body: JSON.stringify({ supervisor, admin }),
           }
         );
         const absentData = await absentResponse.json();

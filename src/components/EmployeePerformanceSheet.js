@@ -1,7 +1,29 @@
 import React from "react";
 import { Container, Table, Card } from "react-bootstrap";
 
-const EmployeePerformanceSheet = ({ data }) => {
+const EmployeePerformanceSheet = () => {
+  const data = [
+    {
+      tracking_id: 1,
+      employee_id: "E001",
+      date: "2025-01-01",
+      total_work_time: "8.5",
+      total_break_time: "1",
+      start_time: "09:00",
+      end_time: "17:30",
+      total_idle_time: "0.5",
+    },
+    {
+      tracking_id: 2,
+      employee_id: "E002",
+      date: "2025-01-02",
+      total_work_time: "7.5",
+      total_break_time: "1.5",
+      start_time: "09:00",
+      end_time: "16:30",
+      total_idle_time: "1",
+    },
+  ];
   // Calculate totals for all employees
   const calculateTotals = () => {
     return data.reduce(

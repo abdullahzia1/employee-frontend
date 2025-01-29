@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Route, Routes } from "react-router-dom";
@@ -18,8 +18,25 @@ import TimeSheetDisplay from "./screens/TimeSheetDisplay.js";
 import EmployeeStatus from "./screens/EmployeeStatus.js";
 
 const App = () => {
+  useEffect(() => {
+    const checkTime = () => {
+      const currentTime = new Date();
+      const currentHour = currentTime.getHours();
+
+      if (currentHour === 7) {
+      }
+    };
+
+    checkTime();
+
+    const interval = setInterval(checkTime, 60000);
+    return () => clearInterval(interval);
+  }, []);
+  // ""
   return (
-    <div>
+    <div
+      style={{ height: "700px", width: "100%", backgroundColor: " #dfd3a0" }}
+    >
       <AuthProvider>
         <Header />
         <ToastContainer />

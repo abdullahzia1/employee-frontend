@@ -4,6 +4,7 @@ import { BASE_URL } from "../utility/helper";
 import AuthContext from "../context/AuthContext";
 
 import { convertToPakTime } from "../utility/timeConvert";
+import { apiService } from "../service/apiService";
 
 const SingleAttendanceDisplay = () => {
   const [attendanceDate, setAttendanceDate] = useState(null);
@@ -13,20 +14,17 @@ const SingleAttendanceDisplay = () => {
   const [checkInTime, setCheckInTime] = useState(null);
   const [checkOutTime, setCheckOutTime] = useState(null);
 
-  const { authToken, user } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
 
   const fetchAttendanceRecord = async (e) => {
     e.preventDefault();
     try {
       let employeeId = user.employee_id;
-      const response = await fetch(`${BASE_URL}/employee/get-attendance`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `${authToken}`,
-        },
-        body: JSON.stringify({ attendanceDate, employeeId }),
-      });
+
+      const response = await apiService.post(
+        `${BASE_URL}/employee/get-attendance`,
+        { attendanceDate, employeeId }
+      );
 
       if (response.status === 200) {
         const data = await response.json();
@@ -45,26 +43,28 @@ const SingleAttendanceDisplay = () => {
 
   useEffect(() => {
     if (data) {
-      // console.log("Re Render", data?.checkIn?.slice(11, 13));
-      console.log("Re Render", data?.checkIn);
       setCheckInTime(convertToPakTime(data?.checkIn));
       setCheckOutTime(convertToPakTime(data?.checkOut));
     }
   }, [data]);
   return (
     <div
-      className="container mt-4 p-4 bg-white rounded shadow-sm"
-      style={{ backgroundColor: "#f9f9f9" }}
+      className="container mt-4 p-4 rounded shadow-sm"
+      style={{ backgroundImage: " #dfd3a0" }}
     >
       <div className="mb-4">
         <h2>My Attendance Records</h2>
       </div>
       <form className="mb-4">
-        <div className="mb-3 row">
-          <label htmlFor="date" className="col-sm-2 col-form-label">
+        <div className="mb-3 row ">
+          <label
+            htmlFor="date"
+            className="col-sm-1 fw-bold col-form-label "
+            style={{ marginLeft: "40px" }}
+          >
             Date*
           </label>
-          <div className="col-sm-6">
+          <div className="col-sm-2">
             <input
               type="date"
               onChange={(e) => {
@@ -93,12 +93,21 @@ const SingleAttendanceDisplay = () => {
       {data === null && <p>No Data</p>}
       <div>
         <div className="text-end fw-bold mb-2">Shift Duration (Hours): 9</div>
-        <table className="table table-bordered">
-          <thead className="table-light">
-            <tr>
-              <th>Check In</th>
-              <th>Check Out</th>
-              <th>Worked (Hours)</th>
+        <table
+          className="table table-bordered"
+          style={{ background: " #dfd3a0" }}
+        >
+          <thead className="table" style={{ backgroundColor: " #dfd3a0" }}>
+            <tr style={{ backgroundColor: " #dfd3a0" }}>
+              <th
+                style={{
+                  backgroundColor: "#70706f",
+                }}
+              >
+                Check In
+              </th>
+              <th style={{ backgroundColor: "#70706f" }}>Check Out</th>
+              <th style={{ backgroundColor: "#70706f" }}>Worked (Hours)</th>
             </tr>
           </thead>
           <tbody>

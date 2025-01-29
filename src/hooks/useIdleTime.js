@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AGENT_URL } from "../utility/helper";
+import { apiService } from "../service/apiService";
 
 // This is a simple fetch function wrapped for time tracking actions
 const useIdleTime = () => {
@@ -16,25 +17,18 @@ const useIdleTime = () => {
     };
 
     try {
-      const response = await fetch(`${AGENT_URL}/${url}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestData),
+      const data = await apiService.post(`${AGENT_URL}/${url}`, {
+        requestData,
       });
 
-      if (!response.status === 200) {
+      if (!data) {
         throw new Error("Error performing action");
       }
-
-      const data = await response.json();
-      console.log("Data from Hook", data);
-      return data; // You can return the response from the backend here if needed
+      return data;
     } catch (error) {
       console.log("ERROR !!!!", error);
       setError(error.message);
-      return null; // If you want to handle this in your component later
+      return null;
     } finally {
       setLoading(false);
     }
